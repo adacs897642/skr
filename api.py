@@ -27,8 +27,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # silence the deprecation 
 app.config['SQLALCHEMY_ECHO'] = True
 
 app.config['SECRET_KEY'] = 'secret!'
+# cors = CORS(app)
+# app.config['CORS_HEADERS'] = 'Content-Type'
+# app.config['transports'] = 'websocket'
+# socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"], logger=True, engineio_logger=True)
 CORS(app, resources={r"/*": {"origins": "*"}})
-
+#
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # db.app = app
@@ -121,7 +125,7 @@ def syslog():
             answer = Syslog.query.order_by(Syslog.time.desc()).paginate(page=page, per_page=per_page, error_out=False)
             # answer = Syslog.query.paginate()
         # print(answer)
-        data = jsonify([result.serialized for result in answer])
+        data = jsonify([result.serialized for result in answer.items])
         # data = [result.serialized for result in answer]
         resp = make_response(data)
         resp.headers['x-total-count'] = total_count
@@ -281,5 +285,5 @@ def prepare_message_update_syslog(curs, id_syslog):
 if __name__ == '__main__':
     # app.run()
     socketio.start_background_task(my_other_thread)
-    socketio.run(app, debug=True, port=5000)
+    socketio.run(app, debug=True, port=5000, host="0.0.0.0")
     print('test')
